@@ -42,8 +42,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: const Color(0xFF0284C7),
-                borderRadius: BorderRadius.circular(8),
+                color: AppTheme.primaryBlue,
+                borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(Icons.auto_awesome, color: Colors.white, size: 18),
             ),
@@ -53,11 +53,11 @@ class _HomeScreenState extends State<HomeScreen> {
               children: const [
                 Text(
                   "ADHIKAR AI",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: Colors.white),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppTheme.textPrimary),
                 ),
                 Text(
                   "National Innovation & Grievance Portal",
-                  style: TextStyle(fontSize: 10.5, color: Color(0xFF94A3B8), fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 10.5, color: AppTheme.textSecondary, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -65,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.map_outlined, color: Colors.white),
+            icon: const Icon(Icons.map_outlined),
             tooltip: "GIS Map View",
             onPressed: () {
               Navigator.of(context).push(
@@ -74,88 +74,90 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.settings_ethernet, color: Colors.white),
+            icon: const Icon(Icons.settings_ethernet),
             tooltip: "Server IP",
             onPressed: () => _showServerIpDialog(context, provider),
           ),
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.white),
+            icon: const Icon(Icons.refresh),
             tooltip: "Sync with State Portal",
             onPressed: () => provider.loadChallenges(),
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () => provider.loadChallenges(),
-        color: AppTheme.primaryBlue,
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: 100),
-          children: [
-            // 1. KPI Banner Card
-            _buildKpiBanner(allChallenges.length, inRndCount, resolvedCount),
+      body: AppPageBackground(
+        child: RefreshIndicator(
+          onRefresh: () => provider.loadChallenges(),
+          color: AppTheme.primaryBlue,
+          child: ListView(
+            padding: const EdgeInsets.only(bottom: 112),
+            children: [
+              // 1. KPI Banner Card
+              _buildKpiBanner(allChallenges.length, inRndCount, resolvedCount),
 
-            // 2. Search Box
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: TextField(
-                controller: _searchController,
-                onChanged: (val) => provider.setSearchQuery(val),
-                decoration: InputDecoration(
-                  hintText: "Search by challenge, district or village...",
-                  hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
-                  prefixIcon: const Icon(Icons.search, color: Color(0xFF64748B), size: 20),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, size: 18),
-                          onPressed: () {
-                            _searchController.clear();
-                            provider.setSearchQuery("");
-                          },
-                        )
-                      : null,
+              // 2. Search Box
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (val) => provider.setSearchQuery(val),
+                  decoration: InputDecoration(
+                    hintText: "Search by challenge, district or village...",
+                    hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+                    prefixIcon: const Icon(Icons.search, color: Color(0xFF64748B), size: 20),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear, size: 18),
+                            onPressed: () {
+                              _searchController.clear();
+                              provider.setSearchQuery("");
+                            },
+                          )
+                        : null,
+                  ),
                 ),
               ),
-            ),
 
-            // 3. Thematic Domain Filter Chips
-            _buildDomainChips(provider),
+              // 3. Thematic Domain Filter Chips
+              _buildDomainChips(provider),
 
-            // 4. Section Title & Stage Count
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Community Challenges (${challenges.length})",
-                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE2E8F0),
-                      borderRadius: BorderRadius.circular(12),
+              // 4. Section Title & Stage Count
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Community Challenges (${challenges.length})",
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF0F172A)),
                     ),
-                    child: const Text(
-                      "⚡ 8-Stage Pipeline",
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE2E8F0),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        "⚡ 8-Stage Pipeline",
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: Color(0xFF334155)),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            // 5. Challenge Cards List
-            if (provider.isLoading)
-              const Padding(
-                padding: EdgeInsets.all(40),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (challenges.isEmpty)
-              _buildEmptyState()
-            else
-              ...challenges.map((c) => _buildChallengeCard(context, c, provider)),
-          ],
+              // 5. Challenge Cards List
+              if (provider.isLoading)
+                const Padding(
+                  padding: EdgeInsets.all(40),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (challenges.isEmpty)
+                _buildEmptyState()
+              else
+                ...challenges.map((c) => _buildChallengeCard(context, c, provider)),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -178,20 +180,20 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildKpiBanner(int total, int inRnd, int resolved) {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(18, 14, 18, 16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          colors: [Color(0xFF193D6C), Color(0xFF2878F0), Color(0xFF3B9CCB)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(26),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.12),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppTheme.primaryBlue.withOpacity(0.24),
+            blurRadius: 26,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -252,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 2),
         Text(
           title,
-          style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11, fontWeight: FontWeight.w600),
+          style: TextStyle(color: Colors.white.withOpacity(0.82), fontSize: 10.5, fontWeight: FontWeight.w600),
         ),
       ],
     );
@@ -321,21 +323,10 @@ class _HomeScreenState extends State<HomeScreen> {
           MaterialPageRoute(builder: (_) => ChallengeDetailScreen(challenge: c)),
         );
       },
-      child: Container(
+      child: AppGlassPanel(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
+        borderRadius: BorderRadius.circular(22),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Card Image with Badges

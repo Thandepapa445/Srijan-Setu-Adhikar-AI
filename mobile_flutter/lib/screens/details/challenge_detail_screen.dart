@@ -60,41 +60,42 @@ class _ChallengeDetailScreenState extends State<ChallengeDetailScreen> {
       appBar: AppBar(
         title: Text("Challenge #${c.id}"),
       ),
-      body: ListView(
-        padding: const EdgeInsets.only(bottom: 60),
-        children: [
-          // 1. Evidence Image
-          Stack(
-            children: [
-              CachedNetworkImage(
-                imageUrl: c.evidenceImageUrl,
-                height: 220,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
-              Positioned(
-                bottom: 12,
-                left: 12,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.8),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    "📍 Lat: ${c.latitude.toStringAsFixed(4)}°, Lng: ${c.longitude.toStringAsFixed(4)}° • Authentic Evidence",
-                    style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+      body: AppPageBackground(
+        child: ListView(
+          padding: const EdgeInsets.only(bottom: 60),
+          children: [
+            // 1. Evidence Image
+            Stack(
+              children: [
+                CachedNetworkImage(
+                  imageUrl: c.evidenceImageUrl,
+                  height: 220,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                Positioned(
+                  bottom: 12,
+                  left: 12,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      "📍 Lat: ${c.latitude.toStringAsFixed(4)}°, Lng: ${c.longitude.toStringAsFixed(4)}° • Authentic Evidence",
+                      style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700),
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
 
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 // Domain & Urgency Badges
                 Row(
                   children: [
@@ -186,29 +187,19 @@ class _ChallengeDetailScreenState extends State<ChallengeDetailScreen> {
 
                 if (c.status == "RESOLVED")
                   _buildResolvedCard(c),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildEightStageStepper(int currentIdx) {
-    return Container(
+    return AppGlassPanel(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
+      borderRadius: BorderRadius.circular(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -312,13 +303,9 @@ class _ChallengeDetailScreenState extends State<ChallengeDetailScreen> {
   }
 
   Widget _buildHeiAssignmentCard(ChallengeModel c) {
-    return Container(
+    return AppGlassPanel(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFCBD5E1)),
-      ),
+      borderRadius: BorderRadius.circular(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

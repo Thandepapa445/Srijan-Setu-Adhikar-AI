@@ -501,12 +501,9 @@ class _NewChallengeScreenState extends State<NewChallengeScreen> {
       backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         title: const Text("Submit Civic Challenge"),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF0F172A),
-        elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Color(0xFF64748B)),
+            icon: const Icon(Icons.refresh),
             onPressed: () {
               _acquireGps();
               _triggerAiAnalysis();
@@ -514,77 +511,79 @@ class _NewChallengeScreenState extends State<NewChallengeScreen> {
           )
         ],
       ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          children: [
-            // 1. Live Interactive Draggable Map Card (Rapido/Zepto Style)
-            _buildInteractiveMapCard(),
+      body: AppPageBackground(
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            children: [
+              // 1. Live Interactive Draggable Map Card (Rapido/Zepto Style)
+              _buildInteractiveMapCard(),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // 2. Surrounding Address & Boundary Auto-Filled Card
-            _buildAddressResolutionCard(),
+              // 2. Surrounding Address & Boundary Auto-Filled Card
+              _buildAddressResolutionCard(),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // 3. Challenge Core Details
-            _buildChallengeForm(),
+              // 3. Challenge Core Details
+              _buildChallengeForm(),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // 4. Domain & Priority Selection
-            _buildDomainSelector(),
+              // 4. Domain & Priority Selection
+              _buildDomainSelector(),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // 5. AI Ingestion & HEI Match Preview
-            _buildAiIngestionCard(),
+              // 5. AI Ingestion & HEI Match Preview
+              _buildAiIngestionCard(),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // 6. Evidence Photo Capture with YOLOv8 Verification Gate
-            _buildPhotoEvidenceSection(),
+              // 6. Evidence Photo Capture with YOLOv8 Verification Gate
+              _buildPhotoEvidenceSection(),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            // 7. Submit Action Button
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: _isImageVerifiedCivicHazard ? AppTheme.primaryBlue : const Color(0xFF64748B),
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: _isImageVerifiedCivicHazard ? 3 : 0,
+              // 7. Submit Action Button
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _isImageVerifiedCivicHazard ? AppTheme.primaryBlue : const Color(0xFF64748B),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: _isImageVerifiedCivicHazard ? 3 : 0,
+                ),
+                onPressed: _isSubmitting ? null : _handleSubmit,
+                child: _isSubmitting
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _isImageVerifiedCivicHazard ? Icons.cloud_upload : Icons.lock_outline,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _isImageVerifiedCivicHazard
+                                ? "Submit Verified Challenge"
+                                : "Verify Civic Photo to Submit",
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
+                          ),
+                        ],
+                      ),
               ),
-              onPressed: _isSubmitting ? null : _handleSubmit,
-              child: _isSubmitting
-                  ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          _isImageVerifiedCivicHazard ? Icons.cloud_upload : Icons.lock_outline,
-                          size: 18,
-                          color: Colors.white,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          _isImageVerifiedCivicHazard
-                              ? "Submit Verified Challenge"
-                              : "Verify Civic Photo to Submit",
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
-                        ),
-                      ],
-                    ),
-            ),
 
-            const SizedBox(height: 40),
-          ],
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
@@ -593,19 +592,9 @@ class _NewChallengeScreenState extends State<NewChallengeScreen> {
   // --- SUB-WIDGET BUILDERS ---
 
   Widget _buildInteractiveMapCard() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          )
-        ],
-      ),
-      clipBehavior: Clip.antiAlias,
+    return AppGlassPanel(
+      padding: EdgeInsets.zero,
+      borderRadius: BorderRadius.circular(22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -728,13 +717,9 @@ class _NewChallengeScreenState extends State<NewChallengeScreen> {
   }
 
   Widget _buildAddressResolutionCard() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
+    return AppGlassPanel(
+      padding: const EdgeInsets.all(16),
+      borderRadius: BorderRadius.circular(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -768,13 +753,9 @@ class _NewChallengeScreenState extends State<NewChallengeScreen> {
   }
 
   Widget _buildChallengeForm() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
+    return AppGlassPanel(
+      padding: const EdgeInsets.all(16),
+      borderRadius: BorderRadius.circular(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -862,13 +843,9 @@ class _NewChallengeScreenState extends State<NewChallengeScreen> {
   }
 
   Widget _buildDomainSelector() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
-      ),
+    return AppGlassPanel(
+      padding: const EdgeInsets.all(16),
+      borderRadius: BorderRadius.circular(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -945,13 +922,9 @@ class _NewChallengeScreenState extends State<NewChallengeScreen> {
   }
 
   Widget _buildAiIngestionCard() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FAFC),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFCBD5E1)),
-      ),
+    return AppGlassPanel(
+      padding: const EdgeInsets.all(16),
+      borderRadius: BorderRadius.circular(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -992,17 +965,12 @@ class _NewChallengeScreenState extends State<NewChallengeScreen> {
   }
 
   Widget _buildPhotoEvidenceSection() {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: _isImageVerifiedCivicHazard
-              ? const Color(0xFF86EFAC)
-              : (_aiVisionRejectionReason != null ? const Color(0xFFFCA5A5) : const Color(0xFFE2E8F0)),
-        ),
-      ),
+    return AppGlassPanel(
+      padding: const EdgeInsets.all(16),
+      borderRadius: BorderRadius.circular(20),
+      borderColor: _isImageVerifiedCivicHazard
+          ? const Color(0xFF86EFAC)
+          : (_aiVisionRejectionReason != null ? const Color(0xFFFCA5A5) : AppTheme.cardBorder),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

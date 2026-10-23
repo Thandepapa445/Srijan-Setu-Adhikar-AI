@@ -31,6 +31,7 @@ class _MapViewScreenState extends State<MapViewScreen> {
     }
 
     return Scaffold(
+      backgroundColor: AppTheme.backgroundLight,
       appBar: AppBar(
         title: const Text("National Spatial Intelligence Map"),
         actions: [
@@ -112,20 +113,9 @@ class _MapViewScreenState extends State<MapViewScreen> {
               bottom: 20,
               left: 16,
               right: 16,
-              child: Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.12),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+              child: AppGlassPanel(
+                padding: const EdgeInsets.all(16),
+                borderRadius: BorderRadius.circular(22),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
