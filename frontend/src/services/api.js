@@ -1,0 +1,242 @@
+import axios from "axios";
+import { INITIAL_SEED_CHALLENGES } from "../data/indiaData";
+
+// Dynamically resolve backend via Vite reverse proxy for 100% reliable cross-device communication
+const getApiBaseUrl = () => {
+    if (import.meta.env.VITE_API_BASE_URL) {
+        return import.meta.env.VITE_API_BASE_URL;
+    }
+    return "/api";
+};
+
+const api = axios.create({
+    baseURL: getApiBaseUrl(),
+    headers: {
+        "Content-Type": "application/json",
+    },
+    timeout: 8000,
+});
+
+api.interceptors.request.use((config) => {
+    config.baseURL = getApiBaseUrl();
+    const token = localStorage.getItem("adhikar_token") || localStorage.getItem("sankalp_token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
+// ============================================================================
+// LOCAL STORAGE BACKED SYNC FOR INSTANT OFFLINE / LIVE EXPERIENCE
+// ============================================================================
+
+const STORAGE_KEY = "adhikar_ai_challenges_v2";
+
+const isJunkChallenge = (c) => {
+    if (!c) return true;
+    const txt = `${c.title || ""} ${c.description || ""} ${c.submitterName || ""}`.toLowerCase();
+    return (
+        txt.includes("baoa") ||
+        txt.includes("hjsj") ||
+        txt.includes("hrhw") ||
+        txt.includes("fqgh") ||
+        txt.includes("bwhr") ||
+        txt.includes("abhru") ||
+        txt.includes("leaning here and there") ||
+        txt.includes("kirtiii") ||
+        txt.includes("crops surfers")
+    );
+};
+
+export function getLocalChallenges() {
+    try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                const clean = parsed.filter(c => !isJunkChallenge(c));
+                if (clean.length > 0) return clean;
+            }
+        }
+    } catch (e) {
+        console.error("Local storage read error", e);
+    }
+    return INITIAL_SEED_CHALLENGES;
+}
+
+export function saveLocalChallenges(challenges) {
+    try {
+        if (Array.isArray(challenges)) {
+            const clean = challenges.filter(c => !isJunkChallenge(c));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(clean));
+        }
+    } catch (e) {
+        console.warn("Local storage write error", e);
+    }
+}
+
+// ============================================================================
+// HIGH-LEVEL CHALLENGE API METHODS
+// ============================================================================
+
+export const challengeService = {
+    // Fetch all challenges (backend is primary authoritative source)
+    async getAllChallenges() {
+        try {
+            const res = await api.get("/challenges");
+            if (Array.isArray(res.data) && res.data.length > 0) {
+                const clean = res.data.filter(c => !isJunkChallenge(c));
+                saveLocalChallenges(clean);
+                return clean;
+            }
+        } catch (err) {
+            // Fallback gracefully to local dataset if offline
+        }
+        return getLocalChallenges();
+    },
+
+    // Fetch citizen's own challenges
+    async getMyChallenges(citizenEmail) {
+        try {
+            const res = await api.get("/challenges/my");
+            if (Array.isArray(res.data) && res.data.length > 0) {
+                return res.data;
+            }
+        } catch (err) {
+            // Fallback
+        }
+        const all = getLocalChallenges();
+        if (!citizenEmail) return all;
+        const my = all.filter(c => c.citizenEmail === citizenEmail);
+        return my.length > 0 ? my : all;
+    },
+
+    // Submit / Create new societal challenge
+    async submitChallenge(challengeData) {
+        const newId = challengeData.id || `ADH-2026-${String(Math.floor(1000 + Math.random() * 9000))}`;
+        const fullChallenge = {
+            ...challengeData,
+            id: newId,
+            status: challengeData.status || "SUBMITTED",
+            createdAt: challengeData.createdAt || new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            upvotes: challengeData.upvotes || 1
+        };
+
+        // Always prepend to local storage immediately so it appears on all tabs instantly
+        const list = getLocalChallenges();
+        const updated = [fullChallenge, ...list.filter(c => String(c.id) !== String(newId))];
+        saveLocalChallenges(updated);
+
+        try {
+            // Send to Spring Boot Backend
+            const res = await api.post("/challenges", {
+                title: fullChallenge.title,
+                description: fullChallenge.description,
+                domain: fullChallenge.domain,
+                urgency: fullChallenge.urgency,
+                submitterType: fullChallenge.submitterType,
+                submitterName: fullChallenge.submitterName,
+                district: fullChallenge.district,
+                block: fullChallenge.block,
+                panchayat: fullChallenge.panchayat,
+                locationText: fullChallenge.locationText,
+                latitude: Number(fullChallenge.lat || fullChallenge.latitude || 28.6139),
+                longitude: Number(fullChallenge.lng || fullChallenge.longitude || 77.2090),
+                affectedPopulation: Number(fullChallenge.affectedPopulation || 500),
+                evidenceImageUrl: fullChallenge.evidenceImageUrl || "https://images.unsplash.com/photo-1541888946425-d0fbb180c5f5?w=800"
+            });
+            if (res.data) {
+                const map = new Map();
+                map.set(String(res.data.id), res.data);
+                updated.forEach(c => {
+                    if (String(c.id) !== String(newId) && String(c.id) !== String(res.data.id)) {
+                        map.set(String(c.id), c);
+                    }
+                });
+                const merged = Array.from(map.values());
+                saveLocalChallenges(merged);
+                return res.data;
+            }
+        } catch (err) {
+            console.warn("Backend sync pending, challenge stored in active reactive local cache.", err?.message);
+        }
+
+        return fullChallenge;
+    },
+
+    // Alias for createChallenge to ensure 100% compatibility
+    async createChallenge(challengeData) {
+        return this.submitChallenge(challengeData);
+    },
+
+    // Upvote a community challenge
+    async upvoteChallenge(id) {
+        const list = getLocalChallenges();
+        const updated = list.map(c => {
+            if (String(c.id) === String(id)) {
+                return { ...c, upvotes: (c.upvotes || 0) + 1 };
+            }
+            return c;
+        });
+        saveLocalChallenges(updated);
+        try {
+            await api.post(`/challenges/${id}/upvote`);
+        } catch (e) {
+            // silent
+        }
+        return updated;
+    },
+
+    // Generic Stage Progression Updater (Advances through all 8 Stages)
+    async updateChallengeStatus(id, newStatus, extraData = {}) {
+        const list = getLocalChallenges();
+        const updated = list.map(c => {
+            if (String(c.id) === String(id)) {
+                return {
+                    ...c,
+                    status: newStatus,
+                    ...extraData,
+                    updatedAt: new Date().toISOString()
+                };
+            }
+            return c;
+        });
+        saveLocalChallenges(updated);
+
+        try {
+            const res = await api.put(`/challenges/${id}/status`, {
+                status: newStatus,
+                ...extraData
+            });
+            if (res.data) {
+                const merged = updated.map(c => String(c.id) === String(id) ? res.data : c);
+                saveLocalChallenges(merged);
+                return merged;
+            }
+        } catch (e) {
+            console.warn("Backend status update fallback to local storage", e?.message);
+        }
+        return updated;
+    },
+
+    // Allocate HEI to challenge
+    async allocateHei(id, heiName, labDepartment, facultyMentor, extra = {}) {
+        return this.updateChallengeStatus(id, "ASSIGNED", {
+            assignedHei: heiName,
+            assignedHeiDepartment: labDepartment,
+            facultyMentor: facultyMentor,
+            ...extra
+        });
+    },
+
+    // Citizen verify pilot deployment
+    async verifyPilot(id, feedbackText) {
+        return this.updateChallengeStatus(id, "RESOLVED", {
+            citizenVerificationRequested: false,
+            citizenFeedbackNotes: feedbackText || "Citizen field verification confirmed by local resident & authority."
+        });
+    }
+};
+
+export default api;

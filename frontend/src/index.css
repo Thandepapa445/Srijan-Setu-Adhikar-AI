@@ -1,0 +1,303 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --primary: #0284c7;
+  --primary-dark: #0369a1;
+  --primary-light: #e0f2fe;
+  --accent: #16a34a;
+  --accent-light: #dcfce7;
+  --surface: #ffffff;
+  --bg: #f8fafc;
+  --border: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 6px 20px rgba(15,23,42,0.08);
+  --shadow-lg: 0 12px 36px rgba(15,23,42,0.12);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden !important;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg);
+  color: var(--text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6, .brand-title {
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+input, textarea, select {
+  font-family: inherit;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* Utility Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Leaflet Map Overrides */
+.leaflet-container {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  z-index: 1;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: 4px !important;
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px !important;
+  line-height: 1.4 !important;
+}
+
+/* ==========================================================================
+   MOBILE-ONLY RESPONSIVE ENGINE (Strictly for mobile screens <= 768px)
+   Laptop / PC views (> 768px) remain 100% desktop-standard & untouched.
+   ========================================================================== */
+
+@media screen and (max-width: 768px) {
+  html, body, #root {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  main {
+    padding: 12px 12px 90px 12px !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* 1. Header & Nav Adjustments */
+  .top-gov-bar, div[style*="topGovBar"] {
+    display: none !important;
+  }
+
+  .nav-links-desktop, nav[style*="display: flex"][style*="gap: 2px"] {
+    display: none !important;
+  }
+
+  .nav-container, div[style*="maxWidth: 1280px"] {
+    padding: 0 10px !important;
+    max-width: 100% !important;
+  }
+
+  .brand-subtitle-text, div[style*="brandSubtitle"] {
+    display: none !important;
+  }
+
+  .brand-title-text {
+    font-size: 16px !important;
+  }
+
+  .brand-logo {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  /* Hide header button on mobile since bottom nav already handles it */
+  .submit-challenge-nav-btn,
+  .nav-actions-group a[style*="submitBtn"] {
+    display: none !important;
+  }
+
+  .nav-actions-group a[title*="Higher Education"],
+  .nav-actions-group a[title*="State Nodal"],
+  .nav-actions-group div[style*="userProfile"] {
+    display: none !important;
+  }
+
+  /* 2. Hero Content */
+  .hero-content, div[style*="heroContent"] {
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+    max-width: 100% !important;
+  }
+
+  .hero-content h1 {
+    font-size: 20px !important;
+    line-height: 1.25 !important;
+  }
+
+  .hero-content p {
+    font-size: 12.5px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .hero-content div[style*="display: flex"] {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .hero-content button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* 3. KPI Grid - 2x2 Clean Mobile Stack */
+  .kpi-grid, 
+  div[style*="gridTemplateColumns: repeat(4, 1fr)"] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .kpi-grid > div,
+  div[style*="kpiCard"] {
+    padding: 12px 10px !important;
+    border-radius: 12px !important;
+  }
+
+  .kpi-grid div[style*="kpiValue"] {
+    font-size: 18px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .kpi-grid span[style*="kpiTitle"] {
+    font-size: 11px !important;
+  }
+
+  .kpi-grid span[style*="kpiSub"] {
+    font-size: 9.5px !important;
+    display: block !important;
+  }
+
+  /* 4. Tabs Bar Swipeable */
+  .tabs-bar, div[style*="tabsBar"] {
+    display: flex !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    padding-bottom: 6px !important;
+    gap: 8px !important;
+    margin-bottom: 16px !important;
+    -webkit-overflow-scrolling: touch;
+    width: 100% !important;
+  }
+
+  .tabs-bar button {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* 5. Toolbar Search & Filters Full Width */
+  .toolbar-section, div[style*="toolbar"] {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .toolbar-section div[style*="searchBox"] {
+    min-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .toolbar-section div[style*="filtersGroup"] {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .toolbar-section select {
+    width: 100% !important;
+  }
+
+  /* 6. Challenges Grid - Strictly 1 Card per Row (100% Width) */
+  .challenges-grid,
+  div[style*="challengesGrid"],
+  div[style*="gridTemplateColumns: repeat(2, 1fr)"] {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    width: 100% !important;
+  }
+
+  .challenges-grid > div,
+  div[style*="challengeCard"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 16px 14px !important;
+    border-radius: 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 7. New Challenge Submit Screen Mobile Fixes (Strict 1-Column Stack) */
+  .new-challenge-grid,
+  div[style*="gridTemplateColumns: 2fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+
+  .new-challenge-form-card,
+  .new-challenge-sidebar,
+  div[style*="formCard"],
+  div[style*="sidebar"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 16px 14px !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+  }
+
+  .form-grid-2,
+  .form-grid-3,
+  div[style*="gridTemplateColumns: 1fr 1fr"],
+  div[style*="gridTemplateColumns: repeat(3, 1fr)"] {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  input, select, textarea {
+    font-size: 14px !important;
+    padding: 12px 12px !important;
+    border-radius: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+}
