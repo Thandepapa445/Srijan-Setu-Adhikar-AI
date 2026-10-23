@@ -1,4 +1,4 @@
-# 🇮🇳 ADHIKAR AI (अधिकार AI)
+# ADHIKAR AI (अधिकार AI)
 ### National Citizen Innovation, Grievance Redressal & Academic R&D Ecosystem
 ### Aligned with National Education Policy (NEP 2020) & Ministry of Electronics and IT (MeitY)
 
